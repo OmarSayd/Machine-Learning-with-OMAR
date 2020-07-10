@@ -1,0 +1,3 @@
+the CNN dataset can be made by introducing seperate file
+which is training and testing set and
+each set containing two objects(i.e cats, dogs) with .png extension !!

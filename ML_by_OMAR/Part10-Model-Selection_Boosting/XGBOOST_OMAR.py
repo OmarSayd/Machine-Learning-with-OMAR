@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jul 10 14:25:03 2020
+
+@author: XGBOOST by OMAR
+"""
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv('Churn_Modelling.csv')
+
+X = dataset.iloc[:, 3:13].values    
+y = dataset.iloc[:, 13].values
+
+#encoding categorical feature, independent variable
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+labelencoder_X_1 = LabelEncoder()
+X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
+labelencoder_X_2 = LabelEncoder()
+X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
+onehotencoder = OneHotEncoder(categorical_features=[1])
+X = onehotencoder.fit_transform(X).toarray()
+X = X[:, 1:]   # to avoid dummy variable trap
+
+#spliting data into training and test set
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,random_state=0)
+
+# applying XGBOOST to the dataset
+from xgboost import XGBClassifier
+classifier = XGBClassifier()
+classifier.fit(X_train, y_train)
+
+#Predicting the Test set result
+y_pred = classifier.predict(X_test)
+
+# Making a Confusion matrix and classification report
+from sklearn.metrics import confusion_matrix, classification_report
+cm = confusion_matrix(y_test, y_pred)
+print(classification_report(y_test, y_pred))
+
+# Applying the K-Fold cross validation
+from sklearn.model_selection import cross_val_score
+accuracies = cross_val_score(estimator=classifier, X=X_train, y=y_train, cv = 10)
+accuracies.mean()
+accuracies.std()
+
+
+
+
+
